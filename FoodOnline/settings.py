@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,10 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-pntnzxhwzhb^-%u0l)&0=c3((c(@*mp#o!_s1b$ypm5yb6#1$u'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', cast= bool)
 
 ALLOWED_HOSTS = []
 
@@ -54,7 +56,7 @@ ROOT_URLCONF = 'FoodOnline.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -75,8 +77,11 @@ WSGI_APPLICATION = 'FoodOnline.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST')
     }
 }
 
@@ -115,7 +120,16 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+# tells the browser to add 'static in the URL while searching for the static files.
+STATIC_URL = '/static/'
+# tells django where to keep the static files when collectstatic is called. We can go without collectstatic in our development server,
+# but in production, we need to collectstatic, otherwise static files will not be served.
+# python manage.py collectstatic
+STATIC_ROOT = BASE_DIR / 'static'
+# path where I have placed my static files for Django to look for
+STATICFILES_DIRS = [
+    'FoodOnline/static'
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
